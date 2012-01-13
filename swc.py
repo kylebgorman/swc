@@ -30,6 +30,7 @@ from Queue import Queue
 from math import fsum, fmod
 from threading import Thread
 from multiprocessing import cpu_count
+from os.path import expanduser, expandvars
 
 
 class SoxiThread(Thread):
@@ -68,14 +69,14 @@ if __name__ == '__main__':
     results = []
 
     # create pool of threads
-    for i in xrange(min(cpu_count() - 1, 1)):
+    for i in xrange(cpu_count()):
         t = SoxiThread(paths, results)
         t.setDaemon(True)
         t.start()
 
     # populate queue
     for arg in argv[1:]:
-        for path in iglob(arg):
+        for path in iglob(expanduser(expandvars(arg))):
             paths.put(path)
 
     # wait until processing is done
@@ -87,4 +88,4 @@ if __name__ == '__main__':
     seconds = fmod(seconds, 3600.)
     minutes = int(seconds // 60)
     seconds = fmod(seconds, 60.)
-    print '{0}:{1}:{2:.04}'.format(hours, minutes, seconds)
+    print '{0}:{1:02}:{2:02.04}'.format(hours, minutes, seconds)

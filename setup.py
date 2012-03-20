@@ -23,7 +23,7 @@
 
 from distutils.core import setup, Extension
 
-setup(name='swc', version='.1', author='Kyle Gorman', 
+setup(name='swc', version='0.1', author='Kyle Gorman', 
 description="""SWC audio length calculator""", py_modules=['swc'], 
 ext_modules=[Extension('_swc', sources=['swc.c', 'swc_wrap.c'], 
 libraries=['sndfile'])])

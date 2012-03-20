@@ -29,28 +29,23 @@
 #include <sndfile.h> // http://www.mega-nerd.com/libsndfile
 
 // Get sound file length in seconds
-float sndfile_length(char path[]) {
-    // open
+float sndfile_length(char* path) {
     SF_INFO info;
     SNDFILE* source = sf_open(path, SFM_READ, &info);
-    // quick check for validity
     if (source == NULL || info.sections < 1) return -1.;
-    // compute
     float seconds = info.frames / (float) info.samplerate;
-    // close
     sf_close(source);
-    // return
     return seconds;
 }
 
-// Main method
+// For use as a shell program
 int main(int argc, char* argv[]) {
-    char usage[] = "USAGE: swc FILE1 [FILE2...]\n";
+    char usage[] = "USAGE: swc FILE1 [FILE2...]";
 
     // check for ags
     if (argc < 2) {
-        fprintf(stderr, usage);
-        exit(EXIT_FAILURE);
+        fprintf(stderr, "%s\n", usage);
+        return 1;
     }
 
     // compute
@@ -59,8 +54,7 @@ int main(int argc, char* argv[]) {
     for (/* i = 1 */; i < argc; i++) {
         float val = sndfile_length(argv[i]);
         if (val == -1.) {
-            fprintf(stderr, "Error reading file %s\n", argv[i]);
-            exit(EXIT_FAILURE);
+            fprintf(stderr, "Error reading file %s; ignoring...\n", argv[i]);
         }
         seconds += val;
     }
@@ -70,8 +64,8 @@ int main(int argc, char* argv[]) {
     seconds = fmod(seconds, 3600.);
     int minutes = (int) (seconds / 60.);
     seconds = fmod(seconds, 60.);
-    printf("%d:%02d:%02.02f\n", hours, minutes, seconds);
+    printf("%d:%02d:%05.2f\n", hours, minutes, seconds);
 
     // leave
-    exit(EXIT_SUCCESS);
+    return 0;
 }

@@ -1,12 +1,12 @@
-TARGET?=swc
-PREFIX?=/usr/local
+TARGET=swc
+PREFIX=/usr/local
+CFLAGS=-s -O3
 
 all: c py 
 install: installc installpy
 
 c: 
-	$(CC) -O2 $(CFLAGS) -o $(TARGET) swc.c -lc -lm -lsndfile
-	strip $(TARGET)
+	$(CC) $(CFLAGS) -o $(TARGET) swc.c -lc -lm -lsndfile
 
 py:
 	swig -threads -python swc.i
@@ -21,6 +21,7 @@ installc: $(TARGET)
 
 installpy: $(TARGET)
 	python setup.py install
+	install swc.py threadanything.py $(PREFIX)/bin
 
 clean:
 	python setup.py clean

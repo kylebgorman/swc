@@ -1,26 +1,6 @@
 #!/usr/bin/env python
-# Copyright (c) 2012 Kyle Gorman
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to 
-# deal in the Software without restriction, including without limitation the 
-# rights to use, copy, modify, merge, publish, distribute, sublicense, and/or 
-# sell copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-# IN THE SOFTWARE.
-#
-# threadanything.py: Simplified Python threading
-# Kyle Gorman
+
+import os
 
 from Queue import Queue
 from threading import Thread
@@ -54,8 +34,10 @@ def _ncpu():
     except (KeyError, ValueError):
         pass
 
+
 ## now compute this number once for the module
 _number_of_cpus = _ncpu()
+
 
 class Mapper(Thread):
     """
@@ -110,12 +92,15 @@ class ThreadM(object):
     >>> m.join()
     >>> print reduce(add, m)
     839677
+
+    The default value for n, the number of threads, assumes the mapping 
+    function is CPU-bound. If it's IO-bound, feel free to set it much higher
     """
 
     def __init__(self, mapper, inputvals=None, n=None):
         # choose size of thread pool (= n)
         if n < 1: # which also means undefined
-            n = _number_of_cpus
+            n = _number_of_cpus * 2
         # make queues
         self.tomap  = Queue()
         self.mapped = Queue()
@@ -217,6 +202,7 @@ class ThreadMR(object):
         self.tomap.join()
         self.mapped.join()
         return self.r.result
+
 
 if __name__ == '__main__':
     import doctest

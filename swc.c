@@ -32,7 +32,8 @@
 float sndfile_length(char* path) {
     SF_INFO info;
     SNDFILE* source = sf_open(path, SFM_READ, &info);
-    if (source == NULL || info.sections < 1) return -1.;
+    if (source == NULL || info.sections < 1) 
+        return -1.;
     float seconds = info.frames / (float) info.samplerate;
     sf_close(source);
     return seconds;
@@ -53,10 +54,10 @@ int main(int argc, char* argv[]) {
     float seconds = 0.;
     for (/* i = 1 */; i < argc; i++) {
         float val = sndfile_length(argv[i]);
-        if (val == -1.) {
+        if (val == -1.)
             fprintf(stderr, "Error reading file %s; ignoring...\n", argv[i]);
-        }
-        seconds += val;
+	else 
+            seconds += val;
     }
 
     // print

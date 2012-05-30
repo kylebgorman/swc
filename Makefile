@@ -1,6 +1,6 @@
 TARGET=swc
 PREFIX=/usr/local
-CFLAGS=-s -O3
+CFLAGS= -O2
 
 all: c py 
 install: installc installpy

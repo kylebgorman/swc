@@ -35,7 +35,8 @@ def SWC(path):
     # get Python path
     f = path if isinstance(path, str) else path.name
     val = sndfile_length(f)
-    if val == -1: raise ValueError('Error reading file {0}\n'.format(f))
+    if val == -1: 
+        raise ValueError('Error reading file {0}\n'.format(f))
     return val
 
 if __name__ == '__main__':

@@ -13,7 +13,7 @@ A pecularity of the binary `swc` is that it uses glob internally. So if the foll
 This will work:
 
     $ swc 'wav/*.wav'
-    FILL ME IN
+    28:08:18.25
 
 This surely has some bad consequences, but not ones that come up normally.
 

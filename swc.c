@@ -1,27 +1,29 @@
 /* Copyright (c) 2012 Kyle Gorman
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to 
- * deal in the Software without restriction, including without limitation the 
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or 
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * Permission is hereby granted, free of charge, to any person obtaining a 
+ * copy of this software and associated documentation files (the 
+ * "Software"), to deal in the Software without restriction, including 
+ * without limitation the rights to use, copy, modify, merge, publish, 
+ * distribute, sublicense, and/or sell copies of the Software, and to 
+ * permit persons to whom the Software is furnished to do so, subject to 
+ * the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included 
+ * in all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS 
+ * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY 
+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  * swc.c: C functions
  * Kyle Gorman
  */
 
+#include <glob.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -51,14 +53,24 @@ int main(int argc, char* argv[]) {
 
     // compute
     int i = 1;
+    int j;
     float seconds = 0.;
+    glob_t glob_buffer;
     for (/* i = 1 */; i < argc; i++) {
-        float val = sndfile_length(argv[i]);
-        if (val == -1.)
-            fprintf(stderr, "Error reading file %s; ignoring...\n", argv[i]);
-	else 
-            seconds += val;
+        if (glob(argv[i], GLOB_TILDE, NULL, &glob_buffer) != 0) {
+            fprintf(stderr, "Globbing error occurred; aborting.\n");
+            return -1;
+        }
+        for (j = 0; j < glob_buffer.gl_matchc; j++) {
+            char* fname = glob_buffer.gl_pathv[j];
+            float val = sndfile_length(fname);
+            if (val == -1.)
+                fprintf(stderr, "Error reading '%s'...\n", fname);
+	        else 
+                seconds += val;
+        }
     }
+    globfree(&glob_buffer);
 
     // print
     int hours = (int) (seconds / 3600.);
@@ -67,6 +79,5 @@ int main(int argc, char* argv[]) {
     seconds = fmod(seconds, 60.);
     printf("%d:%02d:%05.2f\n", hours, minutes, seconds);
 
-    // leave
     return 0;
 }
